@@ -6,8 +6,13 @@ import Cart from "./Cart";
 import { useCart } from "../contexts/CartProvider";
 import axios from "axios";
 const Header = () => {
-  const { cartItems, isCheckoutOpen, setIsCheckoutOpen, removeFromCart } =
-    useCart();
+  const {
+    cartItems,
+    isCheckoutOpen,
+    setIsCheckoutOpen,
+    removeFromCart,
+    emptyCart,
+  } = useCart();
 
   useEffect(() => {
     if (isCheckoutOpen) {
@@ -209,7 +214,10 @@ const Checkout = ({
           </button>
           <button
             className="bg-amber-500 text-black px-4 py-2 rounded w-full font-bold cursor-pointer hover:scale-102 hover:bg-amber-600"
-            onClick={() => sendToPaymentGateway(cartItems)}
+            onClick={() => {
+              emptyCart();
+              sendToPaymentGateway(cartItems);
+            }}
           >
             Pay By U-Pay
           </button>
