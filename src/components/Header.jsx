@@ -38,7 +38,7 @@ const Header = () => {
     };
   }, []);
 
-  const url = "https://upay-backend.vercel.app/payment";
+  const url = "http://localhost:3000/payment";
 
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -56,18 +56,28 @@ const Header = () => {
         return;
       }
       setProcessing(true);
-      const response = await axios.post(url, {
-        items: cartItems,
-        amount: finalAmount,
-        merchantSecretId: "c85db23f-6192-4728-8d57-5717af04e268",
-        expiresAfterMinutes: 0,
-        redirectUrl: "https://upay-gateway.vercel.app/",
+      const response = await axios({
+        method: "post",
+        url: url,
+        data: {
+          merchantSecretId: "c85db23f-6192-4728-8d57-5717af04e268",
+          amount: finalAmount,
+          expiresAfterMinutes: 0,
+          redirectUrl: "https://upay-gateway.vercel.app/",
+          items: cartItems.map((item) => ({
+            id: item.id,
+            title: item.title,
+            imageUrl: item.imageUrl,
+            price: item.price,
+          })),
+        },
+        headers: { "Content-Type": "application/json" },
       });
-      // const { checkoutUrl } = response.data;
+
+      const { upayPaymentUrl } = response.data;
       // console.log("Checkout URL:", checkoutUrl);
-      alert("Redirecting to payment gateway...");
       setProcessing(false);
-      window.location.href = checkoutUrl;
+      window.location.href = upayPaymentUrl;
     } catch (error) {
       setProcessing(false);
       setError("Error creating checkout session");
