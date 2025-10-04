@@ -4,8 +4,12 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Outlet } from "react-router-dom";
 import { useCart } from "../contexts/CartProvider";
+import axios from "axios";
 
 const Layout = () => {
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(null);
+
   const { cartItems, isCheckoutOpen, setIsCheckoutOpen, removeFromCart } =
     useCart();
 

@@ -4,7 +4,7 @@ import { MdAccountCircle } from "react-icons/md";
 import { FaShoppingCart } from "react-icons/fa";
 import Cart from "./Cart";
 import { useCart } from "../contexts/CartProvider";
-
+import axios from "axios";
 const Header = () => {
   const { cartItems, isCheckoutOpen, setIsCheckoutOpen, removeFromCart } =
     useCart();
@@ -38,6 +38,43 @@ const Header = () => {
     };
   }, []);
 
+  const url = "http://localhost:3000/payment";
+
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(null);
+  const sendToPaymentGateway = async (cartItems) => {
+    try {
+      const totalAmount = cartItems.reduce(
+        (total, item) => total + item.price,
+        0
+      );
+      const tax = (totalAmount + 5) * 0.1;
+      const shipping = 5;
+      const finalAmount = totalAmount + shipping + tax;
+      if (totalAmount === 0) {
+        setError("Cart is empty");
+        return;
+      }
+      setProcessing(true);
+      const response = await axios.post(url, {
+        items: cartItems,
+        amount: finalAmount,
+        merchantSecretId: "c85db23f-6192-4728-8d57-5717af04e268",
+        expiresAfterMinutes: 0,
+        redirectUrl: "https://upay-gateway.vercel.app/",
+      });
+      // const { checkoutUrl } = response.data;
+      // console.log("Checkout URL:", checkoutUrl);
+      alert("Redirecting to payment gateway...");
+      setProcessing(false);
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      setProcessing(false);
+      setError("Error creating checkout session");
+      console.error("Error creating checkout session:", error);
+    }
+  };
+
   return (
     <div className="h-16 bg-amber-500 text-black flex items-center justify-between px-4 fixed w-full top-0 z-100 ">
       <h1 className="text-xl font-bold">Fintech e-commerce</h1>
@@ -67,6 +104,7 @@ const Header = () => {
           cartItems={cartItems}
           setIsCheckoutOpen={setIsCheckoutOpen}
           removeFromCart={removeFromCart}
+          sendToPaymentGateway={sendToPaymentGateway}
         />
       )}
     </div>
@@ -75,7 +113,12 @@ const Header = () => {
 
 export default Header;
 
-const Checkout = ({ cartItems, setIsCheckoutOpen, removeFromCart }) => {
+const Checkout = ({
+  cartItems,
+  setIsCheckoutOpen,
+  removeFromCart,
+  sendToPaymentGateway,
+}) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
       <div
@@ -154,7 +197,10 @@ const Checkout = ({ cartItems, setIsCheckoutOpen, removeFromCart }) => {
           >
             Cancel
           </button>
-          <button className="bg-amber-500 text-black px-4 py-2 rounded w-full font-bold cursor-pointer hover:scale-102 hover:bg-amber-600">
+          <button
+            className="bg-amber-500 text-black px-4 py-2 rounded w-full font-bold cursor-pointer hover:scale-102 hover:bg-amber-600"
+            onClick={() => sendToPaymentGateway(cartItems)}
+          >
             Pay By U-Pay
           </button>
         </div>
