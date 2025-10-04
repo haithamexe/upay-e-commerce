@@ -38,7 +38,7 @@ const Header = () => {
     };
   }, []);
 
-  const url = "https://upay-backend.vercel.app//payment";
+  const url = "https://upay-backend.vercel.app/payment";
 
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
