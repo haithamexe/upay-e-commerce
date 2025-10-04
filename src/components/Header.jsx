@@ -7,7 +7,7 @@ import { useCart } from "../contexts/CartProvider";
 
 const Header = () => {
   const { cartItems } = useCart();
-  const [isCartOpen, setIsCartOpen] = useState(true);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
