@@ -11,6 +11,9 @@ const CartProvider = ({ children }) => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   useEffect(() => {
+    if (cartItems.length === 0) {
+      setIsCheckoutOpen(false);
+    }
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
